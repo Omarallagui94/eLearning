@@ -1,0 +1,129 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Home | E-Learning{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 300% 300%;
+            animation: gradientBG 12s ease infinite;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .welcome-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            max-width: 900px;
+            margin: 60px auto;
+            animation: fadeInUp 0.7s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .welcome-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .welcome-subtitle {
+            font-size: 18px;
+            text-align: center;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 25px;
+        }
+
+        .menu-box {
+            padding: 25px;
+            background: white;
+            border-radius: 16px;
+            text-align: center;
+            transition: 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .menu-box:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border-color: #f5576c;
+        }
+
+        .menu-box i {
+            font-size: 40px;
+            margin-bottom: 15px;
+            color: #f5576c;
+        }
+
+        .menu-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .menu-text {
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+
+    <div class="welcome-card">
+        <h1 class="welcome-title">Welcome, {{ app.user.firstName }} 👋</h1>
+        <p class="welcome-subtitle">Your learning journey starts here.</p>
+
+        <div class="menu-grid">
+
+            <a href="#" class="menu-box">
+                <i class="bi bi-book"></i>
+                <div class="menu-title">My Courses</div>
+                <div class="menu-text">Continue learning or browse enrolled courses.</div>
+            </a>
+
+            <a href="#" class="menu-box">
+                <i class="bi bi-journal-text"></i>
+                <div class="menu-title">Assignments</div>
+                <div class="menu-text">View deadlines and submit your work.</div>
+            </a>
+
+            <a href="#" class="menu-box">
+                <i class="bi bi-pencil-square"></i>
+                <div class="menu-title">Exams</div>
+                <div class="menu-text">Upcoming exams and previous results.</div>
+            </a>
+
+            <a href="#" class="menu-box">
+                <i class="bi bi-person-lines-fill"></i>
+                <div class="menu-title">Profile</div>
+                <div class="menu-text">Edit your account information.</div>
+            </a>
+
+        </div>
+    </div>
+
+{% endblock %}

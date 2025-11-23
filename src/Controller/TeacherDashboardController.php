@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+class TeacherDashboardController extends AbstractController
+{
+    #[Route('/teacher', name: 'teacher_dashboard')]
+    public function index(): Response
+    {
+        return $this->render('teacher/dashboard.html.twig', [
+            'controller_name' => 'TeacherDashboardController',
+        ]);
+    }
+}

@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Teacher Dashboard{% endblock %}
+
+{% block body %}
+    <style>
+        .teacher-container {
+            padding: 40px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .welcome {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            padding: 40px;
+            border-radius: 16px;
+            color: white;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .welcome h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .cards {
+            display: flex;
+            gap: 20px;
+        }
+
+        .card {
+            flex: 1;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .card i {
+            font-size: 40px;
+            color: #11998e;
+            margin-bottom: 10px;
+        }
+
+        .card-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+    </style>
+
+    <div class="teacher-container">
+
+        <div class="welcome">
+            <h1>Welcome, {{ app.user.firstName }}!</h1>
+            <p>This is your teacher dashboard. Manage your courses and students here.</p>
+        </div>
+
+        <div class="cards">
+            <div class="card">
+                <i class="bi bi-journal-bookmark"></i>
+                <div class="card-title">My Courses</div>
+                <p>View and manage your courses.</p>
+            </div>
+
+            <div class="card">
+                <i class="bi bi-people"></i>
+                <div class="card-title">My Students</div>
+                <p>Track student progress and assignments.</p>
+            </div>
+
+            <div class="card">
+                <i class="bi bi-plus-circle"></i>
+                <div class="card-title">Create Course</div>
+                <p>Create new lessons and course content.</p>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
