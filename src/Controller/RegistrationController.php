@@ -25,33 +25,45 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/register', name: 'app_register')]
-    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, Security $security, EntityManagerInterface $entityManager): Response
+    public function register(
+        Request $request,
+        UserPasswordHasherInterface $userPasswordHasher,
+        Security $security,
+        EntityManagerInterface $entityManager
+    ): Response
     {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
             /** @var string $plainPassword */
             $plainPassword = $form->get('plainPassword')->getData();
 
-            // encode the plain password
-            $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
+            // Encode password
+            $user->setPassword(
+                $userPasswordHasher->hashPassword($user, $plainPassword)
+            );
 
+            $user->setRoles(['ROLE_USER']);
+
+            // Save user to DB
             $entityManager->persist($user);
             $entityManager->flush();
 
-            // generate a signed url and email it to the user
-            $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
+            // Send verification email
+            $this->emailVerifier->sendEmailConfirmation(
+                'app_verify_email',
+                $user,
                 (new TemplatedEmail())
                     ->from(new Address('omarallagui94@gmail.com', 'e learning'))
-                    ->to((string) $user->getEmail())
+                    ->to($user->getEmail())
                     ->subject('Please Confirm your Email')
                     ->htmlTemplate('registration/confirmation_email.html.twig')
             );
 
-            // do anything else you need here, like send an email
-
+            // Auto-login
             return $security->login($user, UserAuthenticator::class, 'main');
         }
 
@@ -65,31 +77,30 @@ class RegistrationController extends AbstractController
     {
         $id = $request->query->get('id');
 
-        if (null === $id) {
+        if (!$id) {
             return $this->render('registration/verify_email.html.twig', [
-                'error' => 'Invalid verification link. Please check your email and try again.',
+                'error' => 'Invalid verification link.'
             ]);
         }
 
         $user = $userRepository->find($id);
 
-        if (null === $user) {
+        if (!$user) {
             return $this->render('registration/verify_email.html.twig', [
-                'error' => 'User not found. Please register again.',
+                'error' => 'User not found.'
             ]);
         }
 
-        // validate email confirmation link, sets User::isVerified=true and persists
         try {
             $this->emailVerifier->handleEmailConfirmation($request, $user);
         } catch (VerifyEmailExceptionInterface $exception) {
             return $this->render('registration/verify_email.html.twig', [
-                'error' => $exception->getReason(),
+                'error' => $exception->getReason()
             ]);
         }
 
         return $this->render('registration/verify_email.html.twig', [
-            'error' => null,
+            'error' => null
         ]);
     }
 }
