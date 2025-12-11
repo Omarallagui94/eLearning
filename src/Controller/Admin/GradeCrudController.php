@@ -3,38 +3,67 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Grade;
-use App\Entity\User;
 use App\Entity\Exam;
-use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class GradeCrudController extends AbstractCrudController
 {
-    private EntityManagerInterface $em;
-
-    public function __construct(EntityManagerInterface $em) {
-        $this->em = $em;
-    }
-
-    public static function getEntityFqcn(): string {
+    public static function getEntityFqcn(): string
+    {
         return Grade::class;
     }
 
-    public function configureFields(string $pageName): iterable {
+    public function configureActions(Actions $actions): Actions
+    {
+        $addGrade = Action::new('addGrade', 'Add Grade')
+            ->linkToRoute('grade_add_for_exam', function (Grade $grade) {
+                return ['id' => $grade->getExam()->getId()];
+            })
+            ->setCssClass('btn btn-success');
 
-        return [
-
-            AssociationField::new('exam')->setLabel('Exam'),
-
-            AssociationField::new('student')
-                ->setLabel('Student')
-                ->setFormTypeOption('choice_label', fn(User $u) =>
-                    $u->getFirstName() . ' ' . $u->getLastName()
-                ),
-
-            NumberField::new('score')->setLabel('Score'),
-        ];
+        return $actions
+            ->add(Crud::PAGE_DETAIL, $addGrade)
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->disable(Action::NEW)
+            ->disable(Action::EDIT)
+            ->disable(Action::DELETE);
     }
+
+
+    public function configureFields(string $pageName): iterable
+    {
+        // -----------------------------------------------------
+        // PAGE 1: INDEX => SHOW EACH EXAM ONLY ONCE
+        // -----------------------------------------------------
+        if ($pageName === Crud::PAGE_INDEX) {
+            return [
+                TextField::new('exam.name', 'Exam')
+                    ->formatValue(function ($value, Grade $grade) {
+                        return $grade->getExam()->getName();
+                    })
+            ];
+        }
+
+        // -----------------------------------------------------
+        // PAGE 2: DETAIL => SHOW LIST OF STUDENT GRADES
+        // -----------------------------------------------------
+        if ($pageName === Crud::PAGE_DETAIL) {
+            return [
+                TextField::new('exam.name', 'Exam'),
+
+                CollectionField::new('exam.grades')
+                    ->setLabel('Grades')
+                    ->setTemplatePath('admin/grade/exam_grades.html.twig'),
+            ];
+        }
+
+        return [];
+    }
+
 }
