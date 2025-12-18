@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Exam: {{ exam.name }}{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <a href="{{ path('teacher_subject_show', {'id': exam.subject.id}) }}" class="btn btn-secondary mb-3">&larr; Back to Subject</a>
+
+    <h1>Exam: {{ exam.name }}</h1>
+    <p><strong>Date:</strong> {{ exam.examDate|date('Y-m-d H:i') }}</p>
+    <p><strong>Classroom:</strong> {{ exam.classroom.name }}</p>
+
+    <hr>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Questions</h3>
+        <a href="{{ path('teacher_question_new', {'id': exam.id}) }}" class="btn btn-success"><i class="bi bi-plus"></i> Add Question</a>
+    </div>
+
+    {% if exam.questions is empty %}
+        <div class="alert alert-warning">This exam has no questions yet.</div>
+    {% else %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Question</th>
+                    <th>Points</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set totalPoints = 0 %}
+                {% for question in exam.questions %}
+                    {% set totalPoints = totalPoints + question.points %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ question.content|nl2br }}</td>
+                        <td>{{ question.points }}</td>
+                        <td>
+                            {# Edit? Maybe later. Requirement said 'simple form, one-by-one' #}
+                            <form method="post" action="{{ path('teacher_question_delete', {'id': question.id}) }}" onsubmit="return confirm('Delete this question?');" style="display:inline-block">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ question.id) }}">
+                                <button class="btn btn-sm btn-danger">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                <tr class="table-secondary">
+                    <td colspan="2" class="text-end"><strong>Total Points:</strong></td>
+                    <td colspan="2"><strong>{{ totalPoints }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+{% endblock %}

@@ -3,63 +3,55 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Subject;
-use App\Entity\User;
-use App\Entity\Classroom;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\Field\CollectionField;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 
 class SubjectCrudController extends AbstractCrudController
 {
-    private EntityManagerInterface $em;
-
-    // Inject Doctrine
-    public function __construct(EntityManagerInterface $em)
-    {
-        $this->em = $em;
-    }
-
     public static function getEntityFqcn(): string
     {
         return Subject::class;
     }
 
+    public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
+    {
+        $qb = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
+        
+        $qb->andWhere('entity.teacher = :user')
+           ->setParameter('user', $this->getUser());
+
+        return $qb;
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        // Teachers usually process subjects assigned to them, not create them.
+        return $actions
+            ->disable(Action::NEW, Action::DELETE)
+            ->add(Crud::PAGE_INDEX, Action::DETAIL);
+    }
+
     public function configureFields(string $pageName): iterable
     {
-        // Load users
-        $allUsers = $this->em->getRepository(User::class)->findAll();
-
-        // Filter only ROLE_TEACHER
-        $teacherUsers = array_filter($allUsers, function(User $u) {
-            return in_array('ROLE_TEACHER', $u->getRoles());
-        });
-
         return [
+            IdField::new('id')->hideOnForm(),
             TextField::new('name'),
-            TextEditorField::new('description')->hideOnIndex(),
-
-            /*
-            |-----------------------------
-            | CLASSROOM SELECT
-            |-----------------------------
-            */
-            AssociationField::new('classroom')
-                ->setLabel('Classroom'),
-
-            /*
-            |-----------------------------
-            | TEACHER SELECT (filtered)
-            |-----------------------------
-            */
-            AssociationField::new('teacher')
-                ->setLabel('Teacher')
-                ->setFormTypeOption('choice_label', fn(User $u) =>
-                    $u->getFirstName() . ' ' . $u->getLastName()
-                )
-                ->setFormTypeOption('choices', $teacherUsers),
+            TextareaField::new('description'),
+            AssociationField::new('classroom'),
+            AssociationField::new('lessons')->onlyOnDetail(),
+            AssociationField::new('exams')->onlyOnDetail(),
         ];
     }
 }
-

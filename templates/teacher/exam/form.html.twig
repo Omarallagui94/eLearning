@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Exam{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <a href="{{ path('teacher_subject_show', {'id': subject.id}) }}" class="btn btn-secondary mb-3">&larr; Back to Subject</a>
+    
+    <h1>{{ exam.id ? 'Edit Exam' : 'Create New Exam' }}</h1>
+    <p class="text-muted">For Subject: {{ subject.name }}</p>
+
+    {{ form_start(form) }}
+        <div class="mb-3">
+            {{ form_row(form.name) }}
+        </div>
+        <div class="mb-3">
+            {{ form_row(form.examDate) }}
+        </div>
+        <button class="btn btn-primary">{{ exam.id ? 'Update' : 'Create' }}</button>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

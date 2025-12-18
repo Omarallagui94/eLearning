@@ -1,0 +1,109 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Manage Exam: {{ exam.name }}{% endblock %}
+
+{% block body %}
+<div class="bg-white border-bottom shadow-sm mb-4">
+    <div class="container py-4">
+         <div class="d-flex justify-content-between align-items-center">
+            <div>
+                 <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2">
+                        <li class="breadcrumb-item"><a href="{{ path('teacher_dashboard') }}" class="text-decoration-none">Dashboard</a></li>
+                         <li class="breadcrumb-item"><a href="{{ path('teacher_subject_exams', {'id': exam.subject.id}) }}" class="text-decoration-none">{{ exam.subject.name }}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ exam.name }}</li>
+                    </ol>
+                </nav>
+                <h1 class="fw-bold mb-0">{{ exam.name }}</h1>
+            </div>
+            <div>
+                <span class="badge bg-{{ exam.questions|length > 0 ? 'success' : 'warning' }} bg-opacity-10 text-{{ exam.questions|length > 0 ? 'success' : 'warning' }} px-3 py-2 rounded-pill">
+                    {{ exam.questions|length }} Questions
+                </span>
+            </div>
+         </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white fw-bold border-bottom">Exam Details</div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item px-0 d-flex justify-content-between">
+                            <span class="text-muted">Date</span>
+                            <span class="fw-medium">{{ exam.examDate|date('M d, Y H:i') }}</span>
+                        </li>
+                        <li class="list-group-item px-0 d-flex justify-content-between">
+                            <span class="text-muted">Duration</span>
+                            <span class="fw-medium">{{ exam.durationMinutes }} mins</span>
+                        </li>
+                        <li class="list-group-item px-0 d-flex justify-content-between">
+                            <span class="text-muted">Classroom</span>
+                            <span class="fw-medium">{{ exam.classroom.name }}</span>
+                        </li>
+                    </ul>
+                     <div class="d-grid mt-3">
+                         <a href="{{ path('teacher_exam_edit', {'id': exam.id}) }}" class="btn btn-light border text-muted">Edit Settings</a>
+                     </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">Questions</h5>
+                    <a href="{{ path('teacher_exam_question_new', {'id': exam.id}) }}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-lg me-1"></i> Add Question
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    {% if exam.questions is empty %}
+                        <div class="text-center py-5">
+                            <p class="text-muted mb-0">No questions added yet.</p>
+                        </div>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="ps-4">#</th>
+                                        <th>Question</th>
+                                        <th>Type</th>
+                                        <th>Points</th>
+                                        <th class="text-end pe-4">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for question in exam.questions %}
+                                        <tr>
+                                            <td class="ps-4 text-muted">{{ question.position|default(loop.index) }}</td>
+                                            <td style="max-width: 300px;">
+                                                <div class="text-truncate fw-medium" title="{{ question.questionText }}">{{ question.questionText }}</div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary bg-opacity-10 text-secondary border">
+                                                    {{ question.type|upper }}
+                                                </span>
+                                            </td>
+                                            <td class="fw-bold">{{ question.points }}</td>
+                                            <td class="text-end pe-4">
+                                                <button class="btn btn-sm btn-light text-danger" title="Delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

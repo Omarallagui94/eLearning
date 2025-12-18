@@ -1,82 +1,75 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Teacher Dashboard{% endblock %}
+{% block title %}Dashboard | Teacher{% endblock %}
 
 {% block body %}
-    <style>
-        .teacher-container {
-            padding: 40px;
-            max-width: 1200px;
-            margin: auto;
-        }
-
-        .welcome {
-            background: linear-gradient(135deg, #11998e, #38ef7d);
-            padding: 40px;
-            border-radius: 16px;
-            color: white;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        }
-
-        .welcome h1 {
-            font-size: 32px;
-            margin-bottom: 10px;
-        }
-
-        .cards {
-            display: flex;
-            gap: 20px;
-        }
-
-        .card {
-            flex: 1;
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .card i {
-            font-size: 40px;
-            color: #11998e;
-            margin-bottom: 10px;
-        }
-
-        .card-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 18px;
-        }
-    </style>
-
-    <div class="teacher-container">
-
-        <div class="welcome">
-            <h1>Welcome, {{ app.user.firstName }}!</h1>
-            <p>This is your teacher dashboard. Manage your courses and students here.</p>
+<div class="container py-4">
+    <div class="row align-items-center mb-5">
+        <div class="col-md-6">
+            <h1 class="display-5 fw-bold text-dark mb-2">My Subjects</h1>
+            <p class="text-muted lead mb-0">Manage your course content and assessments.</p>
         </div>
-
-        <div class="cards">
-            <div class="card">
-                <i class="bi bi-journal-bookmark"></i>
-                <div class="card-title">My Courses</div>
-                <p>View and manage your courses.</p>
-            </div>
-
-            <div class="card">
-                <i class="bi bi-people"></i>
-                <div class="card-title">My Students</div>
-                <p>Track student progress and assignments.</p>
-            </div>
-
-            <div class="card">
-                <i class="bi bi-plus-circle"></i>
-                <div class="card-title">Create Course</div>
-                <p>Create new lessons and course content.</p>
+        <div class="col-md-6 text-md-end">
+            {# Add statistics or quick actions later here #}
+            <div class="p-3 bg-white rounded-3 shadow-sm d-inline-block">
+                <span class="text-muted small text-uppercase fw-bold">Total Subjects</span>
+                <div class="h2 mb-0 fw-bold text-primary">{{ subjects|length }}</div>
             </div>
         </div>
-
     </div>
+    
+    {% if subjects is empty %}
+         <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="bi bi-journal-x text-muted" style="font-size: 4rem;"></i>
+            </div>
+            <h3 class="text-muted">No subjects assigned yet.</h3>
+            <p class="text-muted">Contact the administrator to get started.</p>
+        </div>
+    {% else %}
+        <div class="row g-4">
+            {% for subject in subjects %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4 d-flex flex-column">
+                            <div class="mb-4">
+                                <div class="feature-icon bg-primary bg-gradient text-white mb-3">
+                                    <i class="bi bi-book fs-3"></i>
+                                </div>
+                                <h3 class="card-title h4 fw-bold mb-2">{{ subject.name }}</h3>
+                                {% if subject.classroom %}
+                                    <span class="badge bg-light text-secondary border">
+                                        <i class="bi bi-people-fill me-1"></i> {{ subject.classroom.name }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                            
+                            <p class="card-text text-muted mb-4 flex-grow-1">
+                                {{ subject.description|default('No description provided.')|striptags|slice(0, 100) }}...
+                            </p>
+                            
+                            <div class="d-grid gap-2">
+                                <a href="{{ path('teacher_subject_lessons', {'id': subject.id}) }}" class="btn btn-primary d-flex justify-content-between align-items-center">
+                                    <span>Manage Lessons</span>
+                                    <i class="bi bi-journal-text"></i>
+                                </a>
+                                <a href="{{ path('teacher_subject_exams', {'id': subject.id}) }}" class="btn btn-outline-primary d-flex justify-content-between align-items-center">
+                                    <span>Manage Exams</span>
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-top-0 p-4 pt-0">
+                            <div class="d-flex justify-content-center">
+                                <a href="#" class="text-decoration-none text-muted small hover-link">
+                                    View Subject Details <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

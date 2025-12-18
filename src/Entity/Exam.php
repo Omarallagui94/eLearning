@@ -33,15 +33,25 @@ class Exam
     #[ORM\JoinColumn(nullable: false)]
     private ?Subject $subject = null;
 
+    #[ORM\Column(options: ['default' => 60])]
+    private ?int $durationMinutes = 60;
+
     /**
      * One Exam → Many Grades
      */
     #[ORM\OneToMany(mappedBy: 'exam', targetEntity: Grade::class, cascade: ['persist', 'remove'])]
     private Collection $grades;
 
+    /**
+     * @var Collection<int, ExamQuestion>
+     */
+    #[ORM\OneToMany(mappedBy: 'exam', targetEntity: ExamQuestion::class, orphanRemoval: true)]
+    private Collection $questions;
+
     public function __construct()
     {
         $this->grades = new ArrayCollection();
+        $this->questions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -68,6 +78,17 @@ class Exam
     public function setExamDate(\DateTimeInterface $examDate): self
     {
         $this->examDate = $examDate;
+        return $this;
+    }
+
+    public function getDurationMinutes(): ?int
+    {
+        return $this->durationMinutes;
+    }
+
+    public function setDurationMinutes(int $durationMinutes): self
+    {
+        $this->durationMinutes = $durationMinutes;
         return $this;
     }
 
@@ -126,6 +147,34 @@ class Exam
         if ($this->grades->removeElement($grade)) {
             if ($grade->getExam() === $this) {
                 $grade->setExam(null);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ExamQuestion>
+     */
+    public function getQuestions(): Collection
+    {
+        return $this->questions;
+    }
+
+    public function addQuestion(ExamQuestion $question): self
+    {
+        if (!$this->questions->contains($question)) {
+            $this->questions->add($question);
+            $question->setExam($this);
+        }
+        return $this;
+    }
+
+    public function removeQuestion(ExamQuestion $question): self
+    {
+        if ($this->questions->removeElement($question)) {
+            // set the owning side to null (unless already changed)
+            if ($question->getExam() === $this) {
+                $question->setExam(null);
             }
         }
         return $this;

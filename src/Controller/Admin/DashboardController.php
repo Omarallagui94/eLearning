@@ -2,51 +2,39 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Grade;
-use App\Entity\User;
-use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
+use App\Entity\Exam;
+use App\Entity\Lesson;
+use App\Entity\Question;
+use App\Entity\Subject;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Entity\Subject;
-use App\Entity\Exam;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-
-#[AdminDashboard(routePath: '/admin', routeName: 'admin')]
+#[IsGranted('ROLE_TEACHER')]
 class DashboardController extends AbstractDashboardController
 {
-    #[Route('/admin', name: 'admin')]
+    #[Route('/teacher/admin', name: 'teacher_admin')]
     public function index(): Response
     {
-        // Render your custom dashboard
         return $this->render('admin/dashboard.html.twig');
     }
 
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('E-Learning Admin Panel')
-            ->renderContentMaximized()
-            ->renderSidebarMinimized();
+            ->setTitle('Teacher Dashboard');
     }
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linktoDashboard('Dashboard', 'fa fa-home');
-
-        yield MenuItem::section('User Management');
-        yield MenuItem::linkToCrud('Users', 'fa fa-users', User::class);
-        yield MenuItem::linkToCrud('Classrooms', 'fa fa-school', \App\Entity\Classroom::class);
+        yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
+        yield MenuItem::section('Teaching');
         yield MenuItem::linkToCrud('Subjects', 'fa fa-book', Subject::class);
+        yield MenuItem::linkToCrud('Lessons', 'fa fa-chalkboard-teacher', Lesson::class);
         yield MenuItem::linkToCrud('Exams', 'fa fa-file-alt', Exam::class);
-        yield MenuItem::linkToCrud('Grades', 'fas fa-star', Grade::class);
-
-
-        // Later you'll add:
-        // yield MenuItem::linkToCrud('Courses', 'fa fa-book', Course::class);
-        // yield MenuItem::linkToCrud('Lessons', 'fa fa-list', Lesson::class);
-        // yield MenuItem::linkToCrud('Assignments', 'fa fa-tasks', Assignment::class);
+        yield MenuItem::linkToCrud('Questions', 'fa fa-question-circle', Question::class);
     }
 }

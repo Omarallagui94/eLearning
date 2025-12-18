@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Add Lesson{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <a href="{{ path('teacher_subject_lessons', {'id': subject.id}) }}" class="btn btn-secondary mb-3">&larr; Back to Lessons</a>
+    
+    <h1>Add Lesson</h1>
+    <p class="text-muted">For Subject: {{ subject.name }}</p>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {{ form_start(form) }}
+                <div class="mb-3">
+                    {{ form_row(form.title) }}
+                </div>
+                <div class="mb-3">
+                    {{ form_row(form.description) }}
+                </div>
+                <div class="mb-3">
+                    {{ form_row(form.content) }}
+                </div>
+                <div class="mb-3">
+                    {{ form_row(form.file) }}
+                    <small class="text-muted">Allowed types: PDF, Word, Image (Max 1MB)</small>
+                </div>
+                
+                <div class="d-grid mt-4">
+                    <button class="btn btn-primary btn-lg">Create Lesson</button>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

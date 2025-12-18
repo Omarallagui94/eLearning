@@ -2,7 +2,7 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Exam;
+use App\Entity\Lesson;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
@@ -10,53 +10,40 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
-class ExamCrudController extends AbstractCrudController
+class LessonCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
-        return Exam::class;
+        return Lesson::class;
     }
 
     public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
     {
         $qb = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
         
-        // Filter: Exam -> Teacher = Current User
-        $qb->andWhere('entity.teacher = :user')
+        // Filter: Lesson -> Subject -> Teacher = Current User
+        $qb->join('entity.subject', 's')
+           ->andWhere('s.teacher = :user')
            ->setParameter('user', $this->getUser());
 
         return $qb;
-    }
-    
-    public function createEntity(string $entityFqcn)
-    {
-        $exam = new Exam();
-        $exam->setTeacher($this->getUser());
-        return $exam;
     }
 
     public function configureFields(string $pageName): iterable
     {
         return [
             IdField::new('id')->hideOnForm(),
-            TextField::new('name'),
-            DateTimeField::new('examDate'),
+            TextField::new('title'),
+            TextareaField::new('content'),
             AssociationField::new('subject')
                 ->setQueryBuilder(function (QueryBuilder $qb) {
                     return $qb->andWhere('entity.teacher = :user')
                               ->setParameter('user', $this->getUser());
                 }),
-            AssociationField::new('classroom')
-                ->setHelp('Select the classroom for this exam'),
-                
-            // Instead of separate Question CRUD, we could use CollectionField here if using a complex form, 
-            // but EasyAdmin doesn't support complex embedded forms well out of the box for "simple form one-by-one".
-            // So we will keep Question CRUD separate but maybe link to it.
-            AssociationField::new('questions')->onlyOnDetail(),
         ];
     }
 }

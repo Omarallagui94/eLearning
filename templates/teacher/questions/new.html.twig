@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Add Question{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <a href="{{ path('teacher_exam_show', {'id': exam.id}) }}" class="btn btn-secondary mb-3">&larr; Back to Exam</a>
+
+    <h1>Add Question</h1>
+    <p class="text-muted">Exam: {{ exam.name }}</p>
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {{ form_start(form) }}
+                <div class="mb-3">
+                    {{ form_row(form.questionText) }}
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                         {{ form_row(form.type) }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                         {{ form_row(form.points) }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                         {{ form_row(form.position) }}
+                    </div>
+                </div>
+
+                <div class="mb-3" id="choices-container">
+                    {{ form_row(form.choicesRaw) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_row(form.correctAnswer) }}
+                </div>
+
+                <div class="d-grid mt-4">
+                    <button class="btn btn-primary btn-lg">Save Question</button>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const typeSelect = document.getElementById('exam_question_type');
+        const choicesContainer = document.getElementById('choices-container');
+        const answerHelp = document.getElementById('exam_question_correctAnswer_help');
+
+        function updateUI() {
+            const type = typeSelect.value;
+            if (type === 'mcq') {
+                choicesContainer.style.display = 'block';
+                // Update help text if possible, though simplified here
+            } else {
+                choicesContainer.style.display = 'none';
+            }
+        }
+
+        typeSelect.addEventListener('change', updateUI);
+        updateUI(); // Initial state
+    });
+</script>
+{% endblock %}

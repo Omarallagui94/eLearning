@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ subject.name }} - Exams{% endblock %}
+
+{% block body %}
+<div class="bg-white border-bottom shadow-sm mb-4">
+    <div class="container py-4">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2">
+                        <li class="breadcrumb-item"><a href="{{ path('teacher_dashboard') }}" class="text-decoration-none">Dashboard</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ subject.name }}</li>
+                    </ol>
+                </nav>
+                <h1 class="fw-bold mb-0">Exams</h1>
+                <p class="text-muted mb-0">Manage assessments for {{ subject.name }}</p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="{{ path('teacher_exam_new', {'id': subject.id}) }}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-2"></i>New Exam
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    {% if exams is empty %}
+        <div class="text-center py-5 bg-white rounded-3 shadow-sm border">
+            <div class="mb-3">
+                <i class="bi bi-clipboard-x text-muted" style="font-size: 3rem;"></i>
+            </div>
+            <h4 class="text-muted">No exams created.</h4>
+            <p class="text-muted mb-4">Create an exam to assess your students.</p>
+            <a href="{{ path('teacher_exam_new', {'id': subject.id}) }}" class="btn btn-outline-primary">
+                Create First Exam
+            </a>
+        </div>
+    {% else %}
+        <div class="row g-4">
+            {% for exam in exams %}
+                <div class="col-lg-6">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div>
+                                    <h4 class="fw-bold mb-1">{{ exam.name }}</h4>
+                                    {% if exam.classroom %}
+                                        <span class="badge bg-light text-dark border">{{ exam.classroom.name }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-icon btn-light rounded-circle" type="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                        <li><a class="dropdown-item" href="{{ path('teacher_exam_edit', {'id': exam.id}) }}">Edit</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                         <li>
+                                            <form method="post" action="{{ path('teacher_exam_delete', {'id': exam.id}) }}" onsubmit="return confirm('Delete this exam?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ exam.id) }}">
+                                                <button class="dropdown-item text-danger">Delete</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="row g-3 mb-4">
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center text-muted">
+                                        <i class="bi bi-calendar-event me-2"></i>
+                                        <small>{{ exam.examDate|date('M d, Y H:i') }}</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center text-muted">
+                                        <i class="bi bi-stopwatch me-2"></i>
+                                        <small>{{ exam.durationMinutes }} Minutes</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <a href="{{ path('teacher_exam_show', {'id': exam.id}) }}" class="btn btn-outline-primary">
+                                    Manage Questions
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

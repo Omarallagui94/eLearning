@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Add Question{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <a href="{{ path('teacher_exam_show', {'id': exam.id}) }}" class="btn btn-secondary mb-3">&larr; Back to Exam</a>
+    
+    <h1>Add Question</h1>
+    <p class="text-muted">For Exam: {{ exam.name }}</p>
+
+    {{ form_start(form) }}
+        <div class="mb-3">
+            {{ form_row(form.content) }}
+        </div>
+        <div class="mb-3">
+            {{ form_row(form.points) }}
+        </div>
+        <button class="btn btn-primary">Add Question</button>
+    {{ form_end(form) }}
+</div>
+{% endblock %}
