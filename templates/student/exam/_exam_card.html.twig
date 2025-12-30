@@ -1,0 +1,37 @@
+<div class="col-md-6 col-lg-4">
+    <div class="card h-100 border-0 shadow-sm {{ status == 'past' ? 'bg-light opacity-75' : '' }}">
+        <div class="card-body p-4 d-flex flex-column">
+            <div class="mb-3">
+                <span class="badge {{ status == 'active' ? 'bg-success' : (status == 'upcoming' ? 'bg-primary' : 'bg-secondary') }} bg-gradient mb-2">{{ exam.subject.name }}</span>
+                <h3 class="card-title h5 fw-bold">{{ exam.name }}</h3>
+            </div>
+            
+            <div class="mb-4 text-muted small">
+                <div class="mb-1">
+                    <i class="bi bi-calendar-event me-2"></i> 
+                    {{ exam.examDate ? exam.examDate|date('M j, Y g:i A') : 'TBA' }}
+                </div>
+                <div>
+                    <i class="bi bi-clock-history me-2"></i> 
+                    {{ exam.durationMinutes ? exam.durationMinutes ~ ' mins' : 'Untimed' }}
+                </div>
+            </div>
+            
+            {# Description removed for brevity in card, or can be added back if needed #}
+            
+            {% if status == 'active' %}
+                <a href="{{ path('student_exam_take', {'id': exam.id}) }}" class="btn btn-success w-100 rounded-pill mt-auto">
+                    Start Exam <i class="bi bi-play-fill ms-2"></i>
+                </a>
+            {% elseif status == 'upcoming' %}
+                <button disabled class="btn btn-outline-primary w-100 rounded-pill mt-auto">
+                    Available Soon
+                </button>
+            {% else %}
+                 <button disabled class="btn btn-secondary w-100 rounded-pill mt-auto">
+                    Ended
+                </button>
+            {% endif %}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ subject.name }} | Student{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-transparent p-0">
+            <li class="breadcrumb-item"><a href="{{ path('student_dashboard') }}" class="text-decoration-none">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ subject.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="mb-5">
+        <h1 class="display-5 fw-bold text-dark mb-3">{{ subject.name }}</h1>
+        <p class="lead text-muted">{{ subject.description|default('No description provided.')|striptags }}</p>
+    </div>
+
+    <section>
+        <h2 class="h4 fw-bold text-dark mb-4 pb-2 border-bottom">Lessons</h2>
+        
+        {% if lessons is empty %}
+            <div class="card border-0 bg-light rounded-3 p-5 text-center">
+                <div class="card-body">
+                    <i class="bi bi-journal-album text-muted mb-3" style="font-size: 2.5rem;"></i>
+                    <h5 class="text-muted">No lessons available yet.</h5>
+                </div>
+            </div>
+        {% else %}
+            <div class="list-group list-group-flush shadow-sm rounded-3 overflow-hidden">
+                {% for lesson in lessons %}
+                    <div class="list-group-item list-group-item-action p-4 border-bottom">
+                        <div class="d-flex w-100 justify-content-between align-items-center mb-2">
+                            <h5 class="mb-1 fw-bold text-primary">{{ lesson.title }}</h5>
+                            <small class="text-muted"><i class="bi bi-clock me-1"></i> {{ lesson.createdAt|date('M d, Y') }}</small>
+                        </div>
+                        <p class="mb-3 text-muted">{{ lesson.content|striptags|slice(0, 150) }}...</p>
+                        
+                        {# 
+                           You might want to add a proper 'view lesson' page later.
+                           For now, we can show the file link if it exists in the lesson entity.
+                        #}
+                        
+                        {% if lesson.filePath %}
+                             <a href="{{ asset(lesson.filePath) }}" class="btn btn-sm btn-outline-primary rounded-pill me-2" target="_blank">
+                                <i class="bi bi-file-earmark-arrow-down me-1"></i> Download Material
+                            </a>
+                        {% endif %}
+                        
+                        {# VIdeo support logic removed as it's not implemented in the backend yet #}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
